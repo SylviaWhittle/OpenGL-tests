@@ -120,7 +120,7 @@ int main()
 
 	// Generate Shader Object using vertex shader from default.vert, 
 	// and fragment shader from default.frag.
-	Shader shaderProgram("C:\\Users\\sylvi\\Desktop\\opengl-cpp-template-master\\opengl-cpp-template-master\\default.vert", "C:\\Users\\sylvi\\Desktop\\opengl-cpp-template-master\\opengl-cpp-template-master\\default.frag");
+	Shader shaderProgram("default.vert", "default.frag");
 
 	// Make and bind Vertex Array Object
 	VAO VAO1;

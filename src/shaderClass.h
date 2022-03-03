@@ -1,7 +1,8 @@
 // Here we declare our shader class and other functions associated with it
 #ifndef SHADER_CLASS_H // This "if" makes sure we do not define them twice
 #define SHADER_CLASS_H
-#include <C:\Users\sylvi\Desktop\opengl-cpp-template-master\opengl-cpp-template-master\include\glad\glad.h>
+//#include <C:\Users\sylvi\Desktop\opengl-cpp-template-master\opengl-cpp-template-master\include\glad\glad.h>
+#include <glad/glad.h>
 #include<string>
 #include<fstream>
 #include<sstream>
