@@ -82,7 +82,33 @@ GLuint indices[] =
 	3, 0, 4
 };
 
+GLfloat lightVertices[] =
+{ //     COORDINATES     //
+	-0.1f, -0.1f,  0.1f,
+	-0.1f, -0.1f, -0.1f,
+	 0.1f, -0.1f, -0.1f,
+	 0.1f, -0.1f,  0.1f,
+	-0.1f,  0.1f,  0.1f,
+	-0.1f,  0.1f, -0.1f,
+	 0.1f,  0.1f, -0.1f,
+	 0.1f,  0.1f,  0.1f
+};
 
+GLuint lightIndices[] =
+{
+	0, 1, 2,
+	0, 2, 3,
+	0, 4, 7,
+	0, 7, 3,
+	3, 7, 6,
+	3, 6, 2,
+	2, 6, 5,
+	2, 5, 1,
+	1, 5, 4,
+	1, 4, 0,
+	4, 5, 6,
+	4, 6, 7
+};
 
 int main()
 {
@@ -118,22 +144,22 @@ int main()
 	// In this case the viewport goes from x = 0, y = 0, to x = 800, y = 800
 	glViewport(0, 0, width, height);
 
+
+
+
 	// Generate Shader Object using vertex shader from default.vert, 
 	// and fragment shader from default.frag.
 	Shader shaderProgram("default.vert", "default.frag");
-
 	// Make and bind Vertex Array Object
 	VAO VAO1;
 	// Binding - making a certain object the current object. When something modifies 
 	// an object, it modifies the current object. 
 	// The GL_ARRAY_BUFFER is the kind of buffer we need for the vertex buffer.
 	VAO1.Bind();
-
 	// Make Vertex Buffer Object and link to vertices
 	VBO VBO1(vertices, sizeof(vertices));
 	// Make Elements Buffer Object and link to indices
 	EBO EBO1(indices, sizeof(indices));
-
 	// Link VBO to VAO
 	VAO1.LinkAttrib(VBO1, 0, 3, GL_FLOAT, 6 * sizeof(float), (void*)0);
 	VAO1.LinkAttrib(VBO1, 1, 3, GL_FLOAT, 6 * sizeof(float), (void*)(3 * sizeof(float)));
@@ -141,6 +167,43 @@ int main()
 	VAO1.Unbind();
 	VBO1.Unbind();
 	EBO1.Unbind();
+
+
+
+	// Light shader
+	Shader lightShader("light.vert", "light.frag");
+	// Create and bind Vertex Array Object
+	VAO lightVAO;
+	lightVAO.Bind();
+	// Create the Vertex Buffer Object and link it to the vertices
+	VBO lightVBO(lightVertices, sizeof(lightVertices));
+	// Craete the Elements Buffer Object and link it to the indices
+	EBO lightEBO(lightIndices, sizeof(lightIndices));
+	// Link the VBO attributes like coordinates and colours to the VAO.
+	lightVAO.LinkAttrib(lightVBO, 0, 3, GL_FLOAT, 3 * sizeof(float), (void*)0);
+	// Unbind all after use
+	lightVAO.Unbind();
+	lightVBO.Unbind();
+	lightEBO.Unbind();
+
+	glm::vec4 lightColor = glm::vec4(1.0f, 1.0f, 1.0f, 1.0f);
+	glm::vec3 lightPos = glm::vec3(0.5f, 0.5f, 0.5f);
+	glm::mat4 lightModel = glm::mat4(1.0f);
+	lightModel = glm::translate(lightModel, lightPos);
+
+	glm::vec3 pyramidPos = glm::vec3(0.0f, 0.0f, 0.0f);
+	glm::mat4 pyramidModel = glm::mat4(1.0f);
+	pyramidModel = glm::translate(pyramidModel, pyramidPos);
+
+
+	lightShader.Activate();
+	glUniformMatrix4fv(glGetUniformLocation(lightShader.ID, "model"), 1, GL_FALSE, glm::value_ptr(lightModel));
+	glUniform4f(glGetUniformLocation(lightShader.ID, "lightColor"), lightColor.x, lightColor.y, lightColor.z, lightColor.w);
+	shaderProgram.Activate();
+	glUniformMatrix4fv(glGetUniformLocation(shaderProgram.ID, "model"), 1, GL_FALSE, glm::value_ptr(pyramidModel));
+	glUniform4f(glGetUniformLocation(shaderProgram.ID, "lightColor"), lightColor.x, lightColor.y, lightColor.z, lightColor.w);
+	glUniform3f(glGetUniformLocation(shaderProgram.ID, "lightPos"), lightPos.x, lightPos.y, lightPos.z);
+
 
 	// Enable depth based rendering (order triangle rendering based on position)
 	glEnable(GL_DEPTH_TEST);
@@ -161,7 +224,7 @@ int main()
 
 
 		camera.Inputs(window);
-		camera.Matrix(45.0f, 0.1f, 100.0f, shaderProgram, "camMatrix");
+		camera.Matrix(shaderProgram, "camMatrix");
 
 		// // Create a model of type mat4
 		// glm::mat4 model = glm::mat4(1.0f);
@@ -217,10 +280,14 @@ int main()
 	EBO1.Delete();
 	shaderProgram.Delete();
 
+	lightVAO.Delete();
+	lightVBO.Delete();
+
 	// Delete window 
 	glfwDestroyWindow(window);
 	// Terminate GLFW 
 	glfwTerminate();
 	return 0;
 }
+
 

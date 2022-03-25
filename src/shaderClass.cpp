@@ -21,13 +21,30 @@ std::string get_file_contents(const char* filename)
 // Constructs it from two shaders
 Shader::Shader(const char* vertexFile, const char* fragmentFile)
 {
+    std::ifstream vShaderFile;
+    std::ifstream fShaderFile;
+
+    // Open files
+    vShaderFile.open(vertexFile);
+    fShaderFile.open(fragmentFile);
+    std::stringstream vShaderStream, fShaderStream;
+    // Read file buffers into streams
+    vShaderStream << vShaderFile.rdbuf();
+    fShaderStream << fShaderFile.rdbuf();
+    // Close file handler
+    vShaderFile.close();
+    fShaderFile.close();
+    // Convert stream into string
+    std::string vertexCode = vShaderStream.str();
+    std::string fragmentCode = fShaderStream.str();
+
     std::cout << "btest0";
 
 	// Read files: vertexFile and fragmentFile, store the results in strings
-	std::string vertexCode = get_file_contents(vertexFile);
-    std::cout << vertexCode;
-	std::string fragmentCode = get_file_contents(fragmentFile);
-    std::cout << "btest2";
+	// std::string vertexCode = get_file_contents(vertexFile);
+    // std::cout << vertexCode;
+	// std::string fragmentCode = get_file_contents(fragmentFile);
+    // std::cout << "btest2";
 
     // Convert to char* format
     const char* vertexSource = vertexCode.c_str();
